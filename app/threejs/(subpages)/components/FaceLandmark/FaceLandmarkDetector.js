@@ -99,8 +99,8 @@ export default class FaceLandmarkDetector {
     const landmarks = points.map(p => {
       const point = _landmarks[p] 
       return {
-        x: 1 - point.x,
-        y: point.y,
+        x: getXL(point, this),
+        y: getYL(point, this),
         z: point.z
       }
     })
@@ -117,11 +117,10 @@ export default class FaceLandmarkDetector {
 
   drawSkeleton(_landmarks, _feature) {
    // drawLines(FACE_LANDMARKS_TESSELATION, _landmarks, this)
-
     const landmarks = _landmarks.map(point => {
       return {
-        x: 1 - point.x,
-        y: point.y,
+        x: getXL(point, this),
+        y: getYL(point, this),
         z: point.z
       }
     })
@@ -134,9 +133,24 @@ export default class FaceLandmarkDetector {
         lineWidth: 0.6
       }
     )
- }
+   }
+
+   destroy() {
+    this.detachListeners()
+    this.detector = null
+    this.source = null
+    this.canvas = null
+    this.context = null
+    this.drawingUtils = null
+    this.flipHorizontal = null
+    this.sourceOffsetX = null
+    this.sourceOffsetY = null
+    this.attachListeners = null
+    this.onResize = null
+   }
 }
 
+// source pixels
 function getX(point, _this) {
   const x = point.x * _this.source.canvas.width
   if(_this.flipHorizontal) {
@@ -146,9 +160,29 @@ function getX(point, _this) {
   }
 }
 
+// 0 - 1
+function getXL(point, _this) {
+  const x = point.x
+  const offsetX = _this.sourceOffsetX / window.innerWidth
+  console.log(offsetX)
+  if(_this.flipHorizontal) {
+    return map(x, 0, 1, 1 + offsetX, -offsetX)
+  } else {
+    return map(x, 0, 1, -offsetX, 1 + offsetX)
+  }
+}
+
+// source pixels
 function getY(point, _this) {
   const y = point.y * _this.source.canvas.height
   return map(y, 0, _this.source.canvas.height, -_this.sourceOffsetY, window.innerHeight + _this.sourceOffsetY)
+}
+
+// 0 - 1
+function getYL(point, _this) {
+  const y = point.y
+  const offsetY = _this.sourceOffsetY / window.innerHeight
+  return map(y, 0, 1, -offsetY, 1 + offsetY)
 }
 
 function map(value, in_min, in_max, out_min, out_max) {

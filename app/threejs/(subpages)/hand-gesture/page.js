@@ -2,139 +2,131 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import WebCam from '../components/WebCam/WebcamCanvas'
-import HandGesture from '../components/HandGesture/HandGestureDetector'
+import { useWebcam, useHandGesture } from '@/hooks'
 
 export default function HandPoseSketch() {
-  const containerRef = useRef(null)
-  const webCam = useRef(null)
-  const handGesture = useRef(null)
-  const animationFrame = useRef(null)
+	const mounted = useRef(null)
+
+	const webcam = useWebcam()
+	const handGesture = useHandGesture()
+
+	const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+
+  // const animationFrameRef = useRef(null)
 
   const [hands, setHands] = useState(false)
+  const [leftHands, setLeftHands] = useState(false)
+  const [rightHands, setRightHands] = useState(false)
 
   useEffect(() => {
   	init()
+
   	return () => {
-  		if(animationFrame.current) cancelAnimationFrame(animationFrame.current)
-  		if(handGesture.current) {
-  			handGesture.current.destroy()
-	  		handGesture.current = null
-	  	}
-	  	if(handGesture.current) {
-	  		webCam.current.destroy()
-	  		webCam.current = null
-	  	}
+  		destroy()
   	}
   }, [])
 
+  function onResize() {
+  	resizeCanvas()
+  }
+
+  function resizeCanvas() {
+  	canvasRef.current.width = window.innerWidth
+  	canvasRef.current.height = window.innerHeight
+  }
+
   async function init() {
-  	webCam.current = new WebCam()
-		handGesture.current = new HandGesture({
-			source: webCam.current,
-			canvas: containerRef.current,
-			flipHorizontal: true
+  	mounted.current = true
+  	resizeCanvas()
+
+  	await webcam.init()
+		await handGesture.init({
+			source: webcam.getStream(),
+			canvas: canvasRef.current,
+			flipHorizontal: true,
+			callback: (e) => {
+				console.log('cb', e)
+				drawVideo()
+				detectHands()
+			}
 		})
 
-		await handGesture.current.loadDetector()
-		animate()
+		handGesture.detect()
+		window.addEventListener('resize', onResize)
 	}
 
-	function animate() {
-		if(webCam.current.live) {
-			webCam.current.update()
-			drawVideo()
-			detectHands()
-		}
-
-		animationFrame.current = requestAnimationFrame(animate)
-	}
+	function destroy() {
+  	mounted.current = false
+		window.removeEventListener('resize', onResize)
+		
+		if(handGesture) handGesture.destroy()
+  	if(webcam.stream) webcam.destroy()
+  }
 
   async function detectHands() {
-  	const data = await handGesture.current.detectHands(webCam.current.canvas)
-  	const components = Object.keys(data)
+  	const data = handGesture.getHands()
 
-  	data.forEach(hand => {
-  		drawCloud(hand)
+		data.forEach(hand => {
 			drawSkeleton(hand)
-  	})
+			drawCloud(hand)
+		})
 
-  	if(data.length) {
-			setHands(data)
-		} else {
-			setHands(false)
-		}
-
-  	// const newHands = []
-  	// data.gestures.forEach((g, i) => {
-  	// 	const hand = {}
-  	// 	components.forEach(key => {
-  	// 		hand[key] = data[key][i]
-  	// 	})
-  	// 	delete hand.handednesses
-  	// 	newHands.push(hand)
-  	// })
-
-		// newHands.forEach(hand => {
-		// 	drawCloud(hand)
-		// 	drawSkeleton(hand)
-		// })
-
-		// if(newHands.length) {
-		// 	setHands(newHands)
-		// } else {
-		// 	setHands(false)
-		// }
+		setHands(data)
+		setLeftHands(handGesture.getLeftHands())
+		setRightHands(handGesture.getRightHands())
   }
 
   function drawVideo() {
-  	const { canvas, dimensions } = webCam.current
-  	const context = containerRef.current.getContext('2d')
-  	context.save()
-		context.translate(containerRef.current.width, 0)
-    context.scale(-1, 1)
-		context.filter = 'grayscale() blur(4px) brightness(20%)'
-		context.drawImage(canvas, -dimensions.offsetX, -dimensions.offsetY, dimensions.width, dimensions.height)
-		context.filter = 'none'
-		context.restore()
+  	webcam.draw(canvasRef.current, {
+  		flipHorizontal: true,
+  		filters: 'grayscale() blur(4px) brightness(20%)'
+  	})
   }
 
   function drawCloud(_hand) {
-  	drawFingerCloud(_hand, 'thumb')
-		drawFingerCloud(_hand, 'index_finger')
-		drawFingerCloud(_hand, 'middle_finger')
-		drawFingerCloud(_hand, 'ring_finger')
-		drawFingerCloud(_hand, 'pinky_finger')
+  	drawFingerCloud(_hand)
+  	// drawFingerCloud(_hand, 'thumb')
   }
 
   function drawSkeleton(_hand) {
-		drawFingerSkeleton(_hand, 'thumb')
-		drawFingerSkeleton(_hand, 'index_finger')
-		drawFingerSkeleton(_hand, 'middle_finger')
-		drawFingerSkeleton(_hand, 'ring_finger')
-		drawFingerSkeleton(_hand, 'pinky_finger')
+  	drawFingerSkeleton(_hand)
+		// drawFingerSkeleton(_hand, 'thumb')
   }
 
-  function drawFingerPoint(_point) {
-		handGesture.current.drawPoint(_point)
-	}
-
 	function drawFingerCloud(_hand, _finger) {
-		handGesture.current.drawCloud(_hand, _finger)
+		handGesture.drawCloud(_hand)
+		// handGesture.drawFingerCloud(_hand, _finger)
 	}
 
 	function drawFingerSkeleton(_hand, _finger) {
-		handGesture.current.drawSkeleton(_hand, _finger)
+		handGesture.drawSkeleton(_hand)
+		// handGesture.drawFingerSkeleton(_hand, _finger)
 	}
 
   return (
-  	<div>
-  		<div className='absolute top-6 right-6 text-sm z-10'>
-  			{/*{hands && hands.map(hand =>
-  				<p>{hand.gestures.map(g => g.categoryName).join(' ')}</p>
-				)}*/}
-  		</div>
-  		<canvas ref={containerRef} className='absolute top-0 left-0 pointer-events-none' />
+  	<div className='min-h-screen w-screen'>
+  		{leftHands?.length > 0 &&
+	  		<div className='absolute top-6 left-6 text-sm z-10'>
+	  			{leftHands.map((hand, i) =>
+	  				<p key={hand.handedness.categoryName + '-gestures-' + i}>{hand.gestures.map(g => g.categoryName).join(' ')}</p>
+					)}
+					{leftHands.map((hand, i) =>
+	  				<p key={hand.handedness.categoryName + '-signs-' + i}>{hand.signs.map(g => g.categoryName).join(' ')}</p>
+					)}
+	  		</div>
+	  	}
+	  	{rightHands?.length > 0 &&
+	  		<div className='absolute top-6 right-6 text-sm z-10'>
+	  			{rightHands.map((hand, i) =>
+	  				<p key={hand.handedness.categoryName + '-gestures-' + i}>{hand.gestures.map(g => g.categoryName).join(' ')}</p>
+					)}
+					{rightHands.map((hand, i) =>
+	  				<p key={hand.handedness.categoryName + '-signs-' + i}>{hand.signs.map(g => g.categoryName).join(' ')}</p>
+					)}
+	  		</div>
+	  	}
+  		<canvas ref={canvasRef} className='absolute top-0 left-0 pointer-events-none' />
 		</div>
 	)
 }
