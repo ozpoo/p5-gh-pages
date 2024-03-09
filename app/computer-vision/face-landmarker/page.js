@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import WebCam from '../components/WebCam/WebcamCanvas'
-import FaceLandmark from '../components/FaceLandmark/FaceLandmarkDetector'
+import WebCam from '@/components/WebCam/WebcamCanvas'
+import FaceLandmark from '@/components/FaceLandmark/FaceLandmarkDetector'
 
 export default function HandPoseSketch() {
   const containerRef = useRef(null)
@@ -16,15 +16,7 @@ export default function HandPoseSketch() {
   useEffect(() => {
   	init()
   	return () => {
-  		if(animationFrame.current) cancelAnimationFrame(animationFrame.current)
-  		if(faceLandmark.current) {
-  			faceLandmark.current.destroy()
-	  		faceLandmark.current = null
-	  	}
-	  	if(faceLandmark.current) {
-	  		webCam.current.destroy()
-	  		webCam.current = null
-	  	}
+  		destroy()
   	}
   }, [])
 
@@ -106,6 +98,18 @@ export default function HandPoseSketch() {
 
 	function drawFingerSkeleton(_hand, _finger) {
 		faceLandmark.current.drawSkeleton(_hand, _finger)
+	}
+
+	function destroy() {
+		if(animationFrame.current) cancelAnimationFrame(animationFrame.current)
+		if(faceLandmark.current) {
+			faceLandmark.current.destroy()
+  		faceLandmark.current = null
+  	}
+  	if(faceLandmark.current) {
+  		webCam.current.destroy()
+  		webCam.current = null
+  	}
 	}
 
   return (

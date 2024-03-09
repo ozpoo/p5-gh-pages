@@ -17,7 +17,6 @@ export default function ImageSegmentorSketch() {
 
   useEffect(() => {
   	init()
-
   	return () => {
   		destroy()
   	}

@@ -21,7 +21,6 @@ export default function HandPoseSketch() {
 
   useEffect(() => {
   	init()
-
   	return () => {
   		destroy()
   	}
