@@ -6,6 +6,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import * as faceapi from 'face-api.js'
 
+export const routemetadata = {
+  title: 'Face API'
+}
+
 export default function ToneJSSKetch() {
 	const mounted = useRef(null)
   const containerRef = useRef(null)

@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useWebcam, useImageSegmentor } from '@/hooks'
 
+export const routemetadata = {
+  title: 'Image Segmentation'
+}
+
 export default function ImageSegmentorSketch() {
 	const mounted = useRef(null)
 

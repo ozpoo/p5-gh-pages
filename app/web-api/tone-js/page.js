@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import * as Tone from 'tone'
 
+export const routemetadata = {
+  title: 'ToneJS'
+}
+
 export default function ToneJSSKetch() {
 	const mounted = useRef(null)
   

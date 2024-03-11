@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useWebcam, useHandGesture } from '@/hooks'
 
+export const routemetadata = {
+  title: 'Hand Gesture'
+}
+
 export default function HandPoseSketch() {
 	const mounted = useRef(null)
 

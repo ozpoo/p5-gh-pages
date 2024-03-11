@@ -5,6 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import WebCam from '@/components/WebCam/WebcamCanvas'
 import FaceLandmark from '@/components/FaceLandmark/FaceLandmarkDetector'
 
+export const routemetadata = {
+  title: 'Face Landmarker'
+}
+
 export default function HandPoseSketch() {
   const containerRef = useRef(null)
   const webCam = useRef(null)

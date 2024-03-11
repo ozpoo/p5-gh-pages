@@ -4,6 +4,10 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+export const routemetadata = {
+  title: 'Example'
+}
+
 export default function BodyPoseSketch() {
 	const mounted = useRef(null)
   const containerRef = useRef(null)

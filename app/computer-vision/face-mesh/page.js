@@ -10,6 +10,10 @@ import PointCloud from '@/components/FaceMesh/PointCloud'
 
 import { flattenFacialLandMarkArray, createBufferAttribute } from '@/components/FaceMesh/utils'
 
+export const routemetadata = {
+  title: 'Face Mesh'
+}
+
 export default function FaceMeshSketch() {
 	const mounted = useRef(null)
   const containerRef = useRef(null)

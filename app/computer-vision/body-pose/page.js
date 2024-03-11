@@ -10,6 +10,10 @@ import PointCloud from '@/components/BodyPose/PointCloud'
 
 import { flattenBodyPoseArray, createBufferAttribute, createSkeletonBufferAttribute, getIndexes } from '@/components/BodyPose/utils'
 
+export const routemetadata = {
+  title: 'Body Pose'
+}
+
 export default function BodyPoseSketch() {
 	const mounted = useRef(null)
   const containerRef = useRef(null)

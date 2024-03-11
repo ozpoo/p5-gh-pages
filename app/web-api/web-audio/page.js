@@ -5,6 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import useWebAudio from '@/components/WebAudio/useWebAudio'
 import useTones from '@/components/WebAudio/useTones'
 
+export const routemetadata = {
+  title: 'Web Audio'
+}
+
 export default function WebAudioSketch() {
 	const mounted = useRef(null)
 

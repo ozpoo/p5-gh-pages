@@ -1,12 +1,22 @@
 import Link from 'next/link'
+import { routes } from '@/lib'
 
-export default function APIs() {
+export const routemetadata = {
+  title: 'APIs'
+}
+
+export default async function APIs() {
+  const pages = await routes.getPages({
+    directory: '/apis'
+  })
   return (
     <main className='h-screen w-screen'>
       <ul>
-        <li>
-          <Link href='/apis/national-archives-catalogue'>National Archives Catalogue</Link>
-        </li>
+        {pages.map(page =>
+          <li>
+            <Link href={page.slug}>{page.title}</Link>
+          </li>
+        )}
       </ul>
     </main>
   )

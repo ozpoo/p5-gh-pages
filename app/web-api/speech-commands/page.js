@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import SpeechCommandsDetector from '@/components/SpeechCommands/SpeechCommandsDetector'
 
+export const routemetadata = {
+  title: 'Speech Commands'
+}
+
 export default function FaceMeshSketch() {
 	const mounted = useRef(null)
   const [action, setAction] = useState(false)

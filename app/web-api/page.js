@@ -1,18 +1,22 @@
 import Link from 'next/link'
+import { routes } from '@/lib'
 
-export default function WebAPI() {
+export const routemetadata = {
+  title: 'WebAPI'
+}
+
+export default async function WebAPI() {
+  const pages = await routes.getPages({
+    directory: '/web-api'
+  })
   return (
     <main className='h-screen w-screen'>
       <ul>
-        <li>
-          <Link href='/web-api/speech-commands'>Speech Commands</Link>
-        </li>
-        <li>
-          <Link href='/web-api/tone-js'>ToneJS</Link>
-        </li>
-        <li>
-          <Link href='/web-api/web-audio'>Web Audio</Link>
-        </li>
+        {pages.map(page =>
+          <li>
+            <Link href={page.slug}>{page.title}</Link>
+          </li>
+        )}
       </ul>
     </main>
   )

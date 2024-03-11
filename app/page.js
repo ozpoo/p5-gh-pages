@@ -1,21 +1,20 @@
 import Link from 'next/link'
+import { routes } from '@/lib'
 
-export default function Home() {
+export const routemetadata = {
+  title: 'Home'
+}
+
+export default async function APIs() {
+  const pages = await routes.getPages()
   return (
     <main className='h-screen w-screen'>
       <ul>
-        <li>
-          <Link href='/apis'>APIs</Link>
-        </li>
-        <li>
-          <Link href='/computer-vision'>Computer Vision</Link>
-        </li>
-        <li>
-          <Link href='/three-js'>ThreeJS</Link>
-        </li>
-        <li>
-          <Link href='/web-api'>Web API</Link>
-        </li>
+        {pages.map(page =>
+          <li key={'page-' + page.slug}>
+            <Link href={page.slug}>{page.title}</Link>
+          </li>
+        )}
       </ul>
     </main>
   )

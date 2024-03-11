@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { searchArchives } from './actions'
 
+export const routemetadata = {
+  title: 'National Archives Catalogue'
+}
+
 export default function NationalArchivesCatalogueApi() {
 	const [formState, formAction] = useFormState(searchArchives, { q: '' })
 
@@ -35,7 +39,7 @@ export default function NationalArchivesCatalogueApi() {
 
   return (
 	  <main className='p-8 space-y-12'>
-	    <h1>Page — National Archives Catalogue API</h1>
+	    <h1 className='uppercase text-sm font-bold tracking-wider'>Page — National Archives Catalogue API</h1>
 	    <form action={formAction} className='flex gap-3 items-center'>
 		    <SearchForm hits={hits} setHits={setHits}/>
 	    </form>

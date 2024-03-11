@@ -10,6 +10,10 @@ import PointCloud from '@/components/HandPose/PointCloud'
 
 import { flattenHandPoseArray, getIndexes, createCloudBufferAttribute, createSkeletonBufferAttribute } from '@/components/HandPose/utils'
 
+export const routemetadata = {
+  title: 'Hand Pose'
+}
+
 export default function HandPoseSketch() {
 	const mounted = useRef(null)
   const containerRef = useRef(null)

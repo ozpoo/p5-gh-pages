@@ -13,6 +13,10 @@ import * as tf from '@tensorflow/tfjs'
 
 import { flattenFacialLandMarkArray, createBufferAttribute } from '@/components/FaceMesh/utils'
 
+export const routemetadata = {
+  title: 'Face Emotion'
+}
+
 export default function FaceMeshSketch() {
 	const mounted = useRef(null)
 	const model = useRef(null)
