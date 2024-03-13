@@ -1,8 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import WebcamCanvas from '@/components/WebCam/WebcamCanvas'
 import BodyPoseDetector from '@/components/BodyPose/BodyPoseDetector'
@@ -10,16 +8,18 @@ import PointCloud from '@/components/BodyPose/PointCloud'
 
 import { flattenBodyPoseArray, createBufferAttribute, createSkeletonBufferAttribute, getIndexes } from '@/components/BodyPose/utils'
 
+import { useWebcam, useBodyPose } from '@/hooks'
+
 export const routemetadata = {
   title: 'Body Pose'
 }
 
 export default function BodyPoseSketch() {
 	const mounted = useRef(null)
-  const containerRef = useRef(null)
+  const canvasRef = useRef(null)
 
-  let camera, scene, renderer, controls
-	let windowWidth, windowHeight
+  const webcam = useWebcam()
+  const bodyPose = useBodyPose()
 
   useEffect(() => {
 		init()
@@ -28,96 +28,69 @@ export default function BodyPoseSketch() {
     }
   }, [])
 
+  function onResize() {
+  	resizeCanvas()
+  }
+
   async function init() {
 		mounted.current = true
-	
-		const webCamCanvas = new WebcamCanvas()
-		const bodyPoseDetector = new BodyPoseDetector()
-    const pointCloud = new PointCloud()
+  	resizeCanvas()
 
-  	updateViewport()
-  	
-		await bodyPoseDetector.loadDetector()
+		await webcam.init()
+		await bodyPose.init({
+			source: webcam.getStream(),
+			canvas: canvasRef.current,
+			flipHorizontal: true,
+			callback: (e) => {
+				drawVideo()
+				detectBody()
+			}
+		})
 
-		const container = containerRef.current
+		bodyPose.detect()
 
-		camera = new THREE.PerspectiveCamera(75, windowWidth / windowHeight, 0.01, 100)
-		camera.position.z = 3
-    camera.position.y = 1
-    camera.lookAt(0, 0, 0)
-
-		scene = new THREE.Scene()
-		// scene.background = new THREE.Color(0x000000)
-
-		const gridHelper = new THREE.GridHelper(10, 10)
-    scene.add(gridHelper)
-    
-		scene.add(pointCloud.cloud)
-		scene.add(pointCloud.skeleton)
-
-		renderer = new THREE.WebGLRenderer({ antialias: true } )
-		renderer.setPixelRatio(window.devicePixelRatio )
-		renderer.setSize(windowWidth, windowHeight)
-
-		controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
-
-		container.appendChild(renderer.domElement)
-
-		// stats = new Stats()
-		// container.appendChild(stats.dom)
-
-		window.addEventListener('resize', onWindowResize)
-
-		animate()
+		window.addEventListener('resize', onResize)
 	}
 
-	function updateViewport() {
-		windowWidth = window.innerWidth
-		windowHeight = window.innerHeight
-	}
+	function resizeCanvas() {
+  	canvasRef.current.width = window.innerWidth
+  	canvasRef.current.height = window.innerHeight
+  }
 
-	function onWindowResize() {
-		updateViewport()
-		camera.aspect = window.innerWidth / window.innerHeight
-		camera.updateProjectionMatrix()
-		renderer.setSize(window.innerWidth, window.innerHeight)
-	}
+	function drawVideo() {
+  	webcam.draw(canvasRef.current, {
+  		flipHorizontal: true,
+  		filters: 'grayscale() blur(4px) brightness(20%)'
+  	})
+  }
 
-	function animate() {
-		if(!mounted.current) return
+	async function detectBody() {
+  	const bodies = await bodyPose.getData()
 
-		if(webCamCanvas.receivingStream) {
-			bindBodyDataToPointCloud()
-			webCamCanvas.updateFromWebCam()
-		}
+  	const { landmarks } = bodies
 
-		controls.update()
-		renderer.render(scene, camera)
+  	landmarks.forEach(pose => {
+  		drawCloud(pose)
+  		drawPoseSkeleton(pose, 'left_eye')
+  		drawPoseSkeleton(pose, 'right_eye')
+  	})
+  }
 
-		requestAnimationFrame(animate)
-		// stats.update()
-	}
+  function drawCloud(_landmarks) {
+  	bodyPose.drawCloud(_landmarks)
+  }
 
-	async function bindBodyDataToPointCloud() {
-    const keypoints = await bodyPoseDetector.detectBody(webCamCanvas.canvas)
-    const flatData = flattenBodyPoseArray(keypoints)
-    
-    const bodyPositions = createBufferAttribute(flatData)
-    pointCloud.updateProperty(bodyPositions, 'position')
-
-    const skeletonGeometry = createSkeletonBufferAttribute(flatData)
-    const skeletonIndexes = getIndexes()
-
-    pointCloud.updateSkeletonProperty(skeletonGeometry, skeletonIndexes, 'position')
+  function drawPoseSkeleton(_landmarks, _section) {
+  	bodyPose.drawPoseSkeleton(_landmarks, _section)
   }
 
   function destroy() {
   	mounted.current = false
-    window.removeEventListener('resize', onWindowResize)
+    window.removeEventListener('resize', onResize)
+    if(webcam.stream) webcam.destroy()
   }
 
   return (
-    <div ref={containerRef}></div>
+    <canvas ref={canvasRef} className='absolute top-0 left-0 pointer-events-none' />
   )
 }

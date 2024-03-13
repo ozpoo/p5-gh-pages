@@ -1,3 +1,6 @@
 export { default as useWebcam } from './useWebcam'
 export { default as useHandGesture } from './useHandGesture'
 export { default as useImageSegmentor } from './useImageSegmentor'
+export { default as useBodyPose } from './useBodyPose'
+export { default as useBodyPoseTens } from './useBodyPoseTens'
+export { default as useSpeechCommands } from './useSpeechCommands'

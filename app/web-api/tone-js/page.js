@@ -122,8 +122,8 @@ export default function ToneJSSKetch() {
 		// const tremolo = new Tone.Reverb(9).toDestination()
 		// osc.current = new Tone.Oscillator().connect(tremolo)
 
-		// const tremolo = new Tone.Tremolo(9, 0.75).toDestination().start()
-		// osc.current = new Tone.Oscillator().connect(tremolo)
+		const tremolo = new Tone.Tremolo(4, 0.75).toDestination().start()
+		osc.current = new Tone.Oscillator(120, "sine").connect(tremolo)
 
 		// const tremolo = new Tone.Vibrato(9, 0.75).toDestination()
 		// osc.current = new Tone.Oscillator().connect(tremolo)

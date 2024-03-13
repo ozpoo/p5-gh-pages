@@ -1,18 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-
-import SpeechCommandsDetector from '@/components/SpeechCommands/SpeechCommandsDetector'
+import { useSpeechCommands } from '@/hooks'
 
 export const routemetadata = {
   title: 'Speech Commands'
 }
 
-export default function FaceMeshSketch() {
+export default function SpeechCommands() {
 	const mounted = useRef(null)
   const [action, setAction] = useState(false)
 
-  const speechCommandsDetector = new SpeechCommandsDetector()
+  const speechCommandsDetector = useSpeechCommands()
 
   useEffect(() => {
 		init()
@@ -23,11 +22,12 @@ export default function FaceMeshSketch() {
 
   async function init() {
   	mounted.current = true
-		await speechCommandsDetector.loadDetector()
+		await speechCommandsDetector.init()
 	}
 
 	function destroy() {
 		mounted.current = false
+		speechCommandsDetector.destroy()
 	}
 
   return (
@@ -40,7 +40,7 @@ export default function FaceMeshSketch() {
 		  	Listen
 	  	</button>
 	  	<button onClick={() => {
-	  		speechCommandsDetector.stopListening()
+	  		speechCommandsDetector.stop()
 	  	}}>
 		  	Stop
 	  	</button>

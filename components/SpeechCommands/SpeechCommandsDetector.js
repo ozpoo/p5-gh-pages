@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import * as speechCommands from '@tensorflow-models/speech-commands'
+// import * as speechCommands from '@tensorflow-models/speech-commands'
 
 export default class SpeechCommandsDetector {
   constructor() {
@@ -8,8 +8,8 @@ export default class SpeechCommandsDetector {
   }
 
   async loadDetector() {
-    this.detector = speechCommands.create('BROWSER_FFT', '18w')
-    await this.detector.ensureModelLoaded()
+    // this.detector = speechCommands.create('BROWSER_FFT', '18w')
+    // await this.detector.ensureModelLoaded()
 
     // const transferRecognizer = this.detector.createTransfer('colors')
     // await transferRecognizer.collectExample('red')
@@ -38,7 +38,7 @@ export default class SpeechCommandsDetector {
     // transferRecognizer.loadExamples(serialized)
 
     // console.log(serialized)
-    console.log(this.detector.wordLabels())
+    // console.log(this.detector.wordLabels())
   }
 
   listen(callback) {

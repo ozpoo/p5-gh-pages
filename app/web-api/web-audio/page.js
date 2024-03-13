@@ -46,20 +46,25 @@ export default function WebAudioSketch() {
   return (
   	<div>
   		<div className='flex gap-2'>
-	  		{notes && notes.map(note =>
-	  			<div key={note.note + '-' + note.octive}>
-		  			<button
-		  				className='whitespace-nowrap'
-			  			onClick={() => {
-		  					tonesRef.current.playTone(note.frequency)
+  			<ul>
+		  		{notes && notes.map(note =>
+		  			<li key={note.note + '-' + note.octive} className='flex gap-6 items-center'>
+			  			<button
+			  				className='text-left whitespace-nowrap w-16'
+				  			onClick={() => {
+			  					tonesRef.current.playTone(note.frequency)
+						  	}}>
+					  	{note.note} {note.octive} {tonesRef.current.isPlaying(note.frequency) && 'Playing'}
+				  	</button>
+				  	<button
+					  	onClick={() => {
+					  		tonesRef.current.stopTone(note.frequency)
 					  	}}>
-				  	{note.note} {note.octive} {tonesRef.current.isPlaying(note.frequency) && 'Playing'}
-			  	</button>
-			  	<button onClick={() => {
-			  		tonesRef.current.stopTone(note.frequency)
-			  	}}>Stop</button>
-		  	</div>
-				)}
+					  	Stop
+				  	</button>
+			  	</li>
+					)}
+				</ul>
 			</div>
     </div>
   )

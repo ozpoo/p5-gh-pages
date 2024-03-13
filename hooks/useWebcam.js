@@ -48,6 +48,11 @@ export default function useWebcam() {
   }
 
   function draw(canvas, options) {
+    if(!canvas) {
+      console.log('draw(): no canvas was provided')
+      return false
+    }
+
   	const context = canvas.getContext('2d')
   	const dimensions = getDimensions(canvas)
 
@@ -65,6 +70,11 @@ export default function useWebcam() {
   }
 
   function getDimensions(canvas) {
+    if(!canvas) {
+      console.log('draw(): no canvas was provided')
+      return false
+    }
+
     const innerWidth = canvas.width
     const innerHeight = canvas.height
     const aspectRatio = getAspectRatio()
@@ -98,10 +108,9 @@ export default function useWebcam() {
 	    stream.current.srcObject.getTracks().forEach(track => {
 	    	track.stop()
 	    })
-	    stream.current.stop()
+	    // stream.current.stop()
 	  }
     stream.current = null
-    aspectRatio.current = null
   }
 
   return {

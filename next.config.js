@@ -1,4 +1,8 @@
 module.exports = {
 	reactStrictMode: false,
-	output: 'export'
+	output: 'export',
+	webpack: (config, { isServer }) => {
+    config.resolve.fallback = { fs: false }
+    return config
+  }
 }

@@ -35,8 +35,8 @@ export default function HandPoseSketch() {
   }
 
   function resizeCanvas() {
-  	canvasRef.current.width = window.innerWidth
-  	canvasRef.current.height = window.innerHeight
+  	canvasRef.current.width = canvasRef.current.parentElement.offsetWidth
+  	canvasRef.current.height = canvasRef.current.parentElement.offsetHeight
   }
 
   async function init() {
@@ -108,7 +108,7 @@ export default function HandPoseSketch() {
 	}
 
   return (
-  	<div className='min-h-screen w-screen'>
+  	<div className='min-h-screen w-full relative'>
   		{leftHands?.length > 0 &&
 	  		<div className='absolute top-6 left-6 text-sm z-10'>
 	  			{leftHands.map((hand, i) =>

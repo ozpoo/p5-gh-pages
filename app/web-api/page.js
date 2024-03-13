@@ -6,9 +6,9 @@ export const routemetadata = {
 }
 
 export default async function WebAPI() {
-  const pages = await routes.getPages({
-    directory: '/web-api'
-  })
+  // const pages = await routes.getPages({
+  //   directory: '/web-api'
+  // })
   return (
     <main className='h-screen w-screen'>
       <ul>

@@ -4,6 +4,7 @@ import { GestureRecognizer, FilesetResolver } from '@mediapipe/tasks-vision'
 export default function useHandGesture() {
   const source = useRef(null)
   const flipHorizontal = useRef(null)
+  
   const canvas = useRef(null)
   const context = useRef(null)
 

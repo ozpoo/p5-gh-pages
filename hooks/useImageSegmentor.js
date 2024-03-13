@@ -4,6 +4,8 @@ import { ImageSegmenter, FilesetResolver } from '@mediapipe/tasks-vision'
 export default function useImageSegmentor() {
   const source = useRef(null)
   const flipHorizontal = useRef(null)
+
+  const overlayCanvas = useRef(null)
   const canvas = useRef(null)
   const context = useRef(null)
 
@@ -14,7 +16,6 @@ export default function useImageSegmentor() {
   const lastTime = useRef(null)
 
   const data = useRef(null)
-  const hands = useRef(null)
 
   const callback = useRef(null)
 
@@ -31,6 +32,10 @@ export default function useImageSegmentor() {
 
       canvas.current = props.canvas || false
       context.current = props.canvas?.getContext('2d')
+
+      overlayCanvas.current = document.createElement('canvas')
+      overlayCanvas.current.width = props.source.videoWidth
+      overlayCanvas.current.height = props.source.videoHeight
 
       callback.current = props.callback || false
 
@@ -74,11 +79,12 @@ export default function useImageSegmentor() {
     flipHorizontal.current = null
     canvas.current = null
     context.current = null
+    overlayCanvas.current = null
     imageSegmentor.current = null
-    signRecognizer.current = null
+    labels.current = null
+    animationFrame.current = null
     lastTime.current = null
     data.current = null
-    hands.current = null
     callback.current = null
   }
 
@@ -110,9 +116,7 @@ export default function useImageSegmentor() {
     
     if(video.currentTime !== lastTime.current) {
       lastTime.current = video.currentTime
-
       const segments = await imageSegmentor.current.segmentForVideo(video, Date.now())
-
       data.current = segments
     }
 
@@ -123,6 +127,30 @@ export default function useImageSegmentor() {
     animationFrame.current = requestAnimationFrame(() => {
       detect()
     })
+  }
+
+  function getDimensions() {
+    const innerWidth = canvas.current.width
+    const innerHeight = canvas.current.height
+    const aspectRatio = source.current.aspectRatio
+
+    let width = innerWidth
+    let height = width / aspectRatio
+
+    if(height < innerHeight) {
+      height = innerHeight
+      width = height * aspectRatio
+    }
+
+    const offsetX = (width - innerWidth) / 2
+    const offsetY = (height - innerHeight) / 2
+
+    return {
+      width,
+      height,
+      offsetX,
+      offsetY
+    }
   }
 
   function getData() {
@@ -136,7 +164,8 @@ export default function useImageSegmentor() {
   function drawSegments() {
     const { videoWidth, videoHeight } = source.current
 
-    let imageData = context.current.getImageData(
+    const overlayContext = overlayCanvas.current.getContext('2d')
+    let imageData = overlayContext.getImageData(
       0,
       0,
       videoWidth,
@@ -156,11 +185,21 @@ export default function useImageSegmentor() {
       j += 4
     }
     const uint8Array = new Uint8ClampedArray(imageData.buffer)
-    context.current.putImageData(new ImageData(
+
+    overlayContext.putImageData(new ImageData(
       uint8Array,
       videoWidth,
       videoHeight
     ), 0, 0)
+
+    const dimensions = getDimensions()
+
+    context.current.save()
+    context.current.translate(canvas.current.width, 0)
+    context.current.scale(-1, 1)
+    context.current.globalAlpha = 0.5
+    context.current.drawImage(overlayCanvas.current, -dimensions.offsetX, -dimensions.offsetY, dimensions.width, dimensions.height)
+    context.current.restore()
   }
 
   function getX(point) {
