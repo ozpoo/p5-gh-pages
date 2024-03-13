@@ -1,8 +1,7 @@
 'use server'
 
 export async function searchArchives(prevState, formData) {
-  // const xApiKey = process.env.NAC_XAPI_KEY
-  const xApiKey = 'AlBMXiF4psWQRVk6ZqNLa5JQEC86mAp87FQTVWzg'
+  const xApiKey = process.env.NEXT_PUBLIC_NAC_XAPI_KEY
 
   try {
     const q = formData.get('q')
