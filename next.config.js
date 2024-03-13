@@ -4,5 +4,8 @@ module.exports = {
 	webpack: (config, { isServer }) => {
     config.resolve.fallback = { fs: false }
     return config
+  },
+  compiler: {
+    removeConsole: true
   }
 }
